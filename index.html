@@ -227,22 +227,40 @@
   .fin__tel { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; font-family: var(--v-font-display); font-weight: 600; font-size: var(--v-t-lg); color: var(--v-ink); }
   .fin__msg { display: flex; flex-wrap: wrap; gap: var(--v-4); }
   .fin__msg a { display: inline-flex; align-items: center; min-height: 44px; color: var(--v-ink); font-weight: 500; }
+  /* форма заявки в финале: собирает текст и открывает Telegram владельца */
+  .lead { display: grid; gap: var(--v-3); margin-top: var(--v-6); max-width: 26rem; }
+  .lead__in { font: inherit; font-size: var(--v-t-sm); padding: .8em 1em; border: 1px solid var(--v-hair-strong); border-radius: var(--v-radius); background: var(--v-surface); color: var(--v-ink); }
+  .lead__in::placeholder { color: var(--v-ink-soft); }
+  .lead__in:focus-visible { outline: 2px solid var(--v-accent); outline-offset: 2px; }
+  .lead__ta { resize: vertical; min-height: 3.2em; }
+  .lead .v-btn { justify-self: start; border: 0; cursor: pointer; font: inherit; }
+  .lead__note { margin: 0; font-size: var(--v-t-xs); color: var(--v-ink-soft); max-width: 40ch; }
+  .lead__done { margin: 0; font-size: var(--v-t-sm); color: var(--v-ink); display: none; }
+  .lead.sent .lead__in, .lead.sent .v-btn, .lead.sent .lead__note { display: none; }
+  .lead.sent .lead__done { display: block; }
   .foot { position: absolute; z-index: 3; left: 0; bottom: 0; width: 100vw; padding: var(--v-4) var(--v-gutter); display: flex; justify-content: space-between; gap: var(--v-4); flex-wrap: wrap;
     border-top: 1px solid var(--v-hair); font-size: var(--v-t-sm); color: var(--v-ink-soft); transform: translateX(calc((1 - var(--q)) * 50vw)); }
   @media (max-width: 860px) {
-    .fin__after { clip-path: inset(calc((1 - var(--q)) * 50%) 0 0 0); }
-    .fin__after::before { top: calc((1 - var(--q)) * 50%); left: 0; right: 0; bottom: auto; width: auto; height: 1px; }
-    .fin__before .fin__img { inset: 0 0 auto 0; height: 60%; }
+    .fin__after { clip-path: inset(calc((1 - var(--q)) * 26svh) 0 0 0); }
+    .fin__after::before { top: calc((1 - var(--q)) * 26svh); left: 0; right: 0; bottom: auto; width: auto; height: 1px; }
+    .fin__before .fin__img { inset: 0 0 auto 0; height: 26svh; }
     .fin__before .fin__scrim { background: linear-gradient(to bottom, rgb(36 41 42 / .9) 0%, rgb(36 41 42 / .6) 36%, transparent 66%); }
     .fin__after .fin__scrim { width: auto; transform: none; background: linear-gradient(to top, rgb(238 240 238 / .97) 0%, rgb(238 240 238 / .8) 40%, rgb(238 240 238 / .25) 70%, transparent 100%); }
     .fin__copy { left: var(--v-gutter); right: var(--v-gutter); max-width: none; bottom: auto; top: clamp(3.6rem, 8svh, 5rem); }
-    .fin__after .fin__copy { top: auto; bottom: 5rem; left: var(--v-gutter); width: auto; padding-left: 0; transform: none; }
+    .fin__after .fin__copy { top: calc(26svh + 1rem); bottom: auto; left: var(--v-gutter); right: var(--v-gutter); width: auto; max-width: none; padding-left: 0; transform: none; }
+    .lead { margin-top: var(--v-4); gap: var(--v-2); }
+    .lead__ta, .lead__note { display: none; }
+    .fin__meta { margin-top: var(--v-3); }
     .fin__copy .v-lede { margin-top: var(--v-3); font-size: var(--v-t-base); }
     .fin__copy .v-btn { margin-top: var(--v-5); }
     .fin__meta { margin-top: var(--v-4); flex-direction: row; flex-wrap: wrap; align-items: center; column-gap: var(--v-5); }
     .fin__meta > span { width: 100%; }
     .foot { transform: none; padding: var(--v-3) var(--v-gutter); gap: var(--v-1) var(--v-4); }
     .foot__more { display: none; }
+  }
+  /* на низких экранах кинетика перекрывает строки на границе актов: показываем строки статично */
+  @media (max-height: 560px) {
+    .v-ki { transform: none !important; opacity: 1 !important; }
   }
 </style>
 </head>
@@ -281,6 +299,7 @@
             <p class="v-lede hero__lede">Работаем по графику: план по неделям, фотоотчёт каждые 7 дней, оплата по этапам после приёмки.</p>
             <div class="hero__cta">
               <a class="v-btn" href="#raschet">Рассчитать ремонт</a>
+              <a class="v-btn v-btn--ghost" href="#raschet">Рассчитать ремонт</a>
               <p class="hero__hint">Пришлите план квартиры – вернёмся со сметой и графиком.</p>
             </div>
           </div>
@@ -420,7 +439,14 @@
           <div class="fin__copy" data-v-cue="0 2 0 0" data-v-rise="0">
             <h2 class="v-display v-display--md">Стало: ваша квартира, сданная по графику</h2>
             <p class="v-lede">Пришлите план квартиры и пожелания. Вернёмся со сметой и графиком по неделям.</p>
-            <a class="v-btn" href="#raschet">Рассчитать ремонт</a>
+            <form class="lead" id="lead">
+              <input class="lead__in" name="name" type="text" placeholder="Ваше имя" required autocomplete="name">
+              <input class="lead__in" name="phone" type="tel" placeholder="Телефон" required autocomplete="tel">
+              <textarea class="lead__in lead__ta" name="msg" rows="2" placeholder="План квартиры и пожелания (необязательно)"></textarea>
+              <button class="v-btn" type="submit">Отправить заявку</button>
+              <p class="lead__note">Заявка откроет чат в Telegram с готовым текстом – останется нажать «Отправить».</p>
+              <p class="lead__done">Готово: открылся чат в Telegram, заявка в буфере обмена – нажмите «Отправить».</p>
+            </form>
             <div class="fin__meta">
               <a class="fin__tel" href="tel:+79000000000">+7 (900) 000-00-00</a>
               <span>Есенина, 21, Рязань</span>
@@ -504,6 +530,20 @@
     window.addEventListener('resize', ask);
     window.addEventListener('load', ask);
     tick();
+  })();
+</script>
+<script>
+  // форма заявки: собирает текст, кладёт в буфер и открывает Telegram владельца
+  (function () {
+    var form = document.getElementById('lead');
+    if (!form) return;
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var text = 'Заявка с сайта «Чистый ремонт»\nИмя: ' + form.name.value.trim() + '\nТелефон: ' + form.phone.value.trim() + (form.msg.value.trim() ? '\nПожелания: ' + form.msg.value.trim() : '');
+      try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text); } catch (err) {}
+      form.classList.add('sent');
+      window.open('https://t.me/lbtab', '_blank', 'noopener');
+    });
   })();
 </script>
 </body>
